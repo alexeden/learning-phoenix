@@ -1,0 +1,34 @@
+<h1>New User</h1>
+
+<%= form_for @changeset, user_path(@conn, :create), fn f -> %>
+  <pre>
+    <%= inspect f %>
+  </pre>
+  <pre>Parameters:
+    <%= inspect(f |> Map.get(:params)) %>
+  </pre>
+  <pre>Errors:
+    <%= inspect(f |> Map.get(:errors)) %>
+  </pre>
+  <pre>
+    <%= inspect(f |> Map.get(:data)) %>
+  </pre>
+
+  <div class="form-group">
+    <%= text_input f, :name, placeholder: "Name", class: "form-control" %>
+    <%= error_tag f, :name %>
+  </div>
+
+  <div class="form-group">
+    <%= text_input f, :username, placeholder: "Username", class: "form-control" %>
+    <%= error_tag f, :username %>
+  </div>
+
+  <div class="form-group">
+    <%= password_input f, :password, placeholder: "Password", class: "form-control" %>
+    <%= error_tag f, :password %>
+  </div>
+
+  <%= submit "Create user", class: "btn btn-primary" %>
+
+<% end %>

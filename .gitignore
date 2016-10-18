@@ -1,0 +1,19 @@
+*.beam
+
+# The directory Mix will write compiled artifacts to.
+issues/_build
+
+# If you run "mix test --cover", coverage assets end up here.
+issues/cover
+
+# The directory Mix downloads your dependencies sources to.
+issues/deps
+
+# Where 3rd-party dependencies like ExDoc output generated docs.
+issues/doc
+
+# If the VM crashes, it generates a dump, let's ignore it too.
+issues/erl_crash.dump
+
+# Also ignore archive artifacts (built via "mix archive.build").
+issues/*.ez
