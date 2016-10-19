@@ -24,6 +24,12 @@
             </li>
             <li>
               <%=
+                link "Users",
+                to: user_path(@conn, :index)
+              %>
+            </li>
+            <li>
+              <%=
                 link "Log out",
                 to: session_path(@conn, :delete, @current_user),
                 method: "delete"

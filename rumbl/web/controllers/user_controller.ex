@@ -1,9 +1,10 @@
 defmodule Rumbl.UserController do
   use Rumbl.Web, :controller
   alias Rumbl.User
+  alias Rumbl.Auth
 
   # Attach the authenticate function plug to the :index and :show actions
-  plug :authenticate when action in [:index, :show]
+  plug :authenticate_user when action in [:index, :show]
 
   def index(conn, _params) do
     users = Repo.all(User)
@@ -33,15 +34,4 @@ defmodule Rumbl.UserController do
     end
   end
 
-  # We'll make this authenticate function into a function plug
-  defp authenticate(conn, _opts) do
-    if conn.assigns.current_user do
-      conn
-    else
-      conn
-      |> put_flash(:error, "You gotta be logged in!")
-      |> redirect(to: page_path(conn, :index))
-      |> halt()
-    end
-  end
 end
