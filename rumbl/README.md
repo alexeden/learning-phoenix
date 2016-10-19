@@ -1,3 +1,13 @@
+## General
+
+- For naming pretty much anything relating to models, controllers, and views, always use the *singular* form of the word (eg *user* **not** *users*)
+- The exceptions to the singular word names are URLs and DB table names
+
+## Databases | Ecto
+
+- *Primary keys* are unique identifiers for a *row* in a table
+- *Foreign keys* are unique identifiers for a primary key's row in a *different* table
+
 ## Plugs
 
 All plugs take a `conn` and return a `conn`

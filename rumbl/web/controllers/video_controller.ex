@@ -23,10 +23,7 @@ defmodule Rumbl.VideoController do
   end
 
   def index(conn, _params, user) do
-    videos =
-      user
-      |> user_videos
-      |> Repo.all
+    videos = Repo.all(user_videos(user))
     render(conn, "index.html", videos: videos)
   end
 
@@ -57,10 +54,7 @@ defmodule Rumbl.VideoController do
   end
 
   def show(conn, %{"id" => id}, user) do
-    video =
-      user
-      |> user_videos
-      |> Repo.get!(id)
+    video = user_video_by_id(user, id)
     render(conn, "show.html", video: video)
   end
 
