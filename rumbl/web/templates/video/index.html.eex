@@ -3,9 +3,10 @@
 <table class="table">
   <thead>
     <tr>
+      <th>Title</th>
+      <th>Category</th>
       <th>User</th>
       <th>Url</th>
-      <th>Title</th>
       <th>Description</th>
 
       <th></th>
@@ -14,9 +15,10 @@
   <tbody>
 <%= for video <- @videos do %>
     <tr>
-      <td><%= video.user_id %></td>
-      <td><%= video.url %></td>
       <td><%= video.title %></td>
+      <td><%= video.category %></td>
+      <td><%= @user.username %></td>
+      <td><%= video.url %></td>
       <td><%= video.description %></td>
 
       <td class="text-right">
@@ -24,6 +26,9 @@
         <%= link "Edit", to: video_path(@conn, :edit, video), class: "btn btn-default btn-xs" %>
         <%= link "Delete", to: video_path(@conn, :delete, video), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
       </td>
+    </tr>
+    <tr>
+      <pre><%= inspect video %></pre>
     </tr>
 <% end %>
   </tbody>

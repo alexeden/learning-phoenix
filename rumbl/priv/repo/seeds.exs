@@ -9,3 +9,10 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias Rumbl.Repo
+alias Rumbl.Category
+
+for category <- ~w(Code Funny Music) do
+  Repo.insert!(%Category{ name: category })
+end
