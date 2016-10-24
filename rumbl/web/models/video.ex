@@ -1,6 +1,8 @@
 defmodule Rumbl.Video do
   use Rumbl.Web, :model
 
+  @primary_key {:id, Rumbl.Permalink, autogenerate: true}
+
   schema "videos" do
     field :url, :string
     field :title, :string
@@ -42,11 +44,11 @@ defmodule Rumbl.Video do
 end
 
 
-@doc """
-Implements the Phoenix.Param protocol to allow
-custom URLs (slugs) of Rumbl.Video structs
-"""
 defimpl Phoenix.Param, for: Rumbl.Video do
+  @doc """
+  Implements the Phoenix.Param protocol to allow
+  custom URLs (slugs) of Rumbl.Video structs
+  """
   def to_param(%{slug: slug, id: id}) do
     "#{id}-#{slug}"
   end
