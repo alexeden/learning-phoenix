@@ -1,9 +1,5 @@
 defmodule Rumbl.UserSocket do
   use Phoenix.Socket
-
-  ## Channels
-  # channel "room:*", Rumbl.RoomChannel
-
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
   # transport :longpoll, Phoenix.Transports.LongPoll
@@ -19,7 +15,8 @@ defmodule Rumbl.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
+  def connect(params, socket) do
+    IO.puts "UserSocket params: #{inspect params}"
     {:ok, socket}
   end
 

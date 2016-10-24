@@ -75,7 +75,6 @@ defmodule Rumbl.VideoController do
   end
 
   def update(conn, %{"id" => id, "video" => video_params}, user) do
-    IO.puts "Updating video with params: #{inspect video_params}"
     video = user_video_by_id(user, id)
     changeset = Video.changeset(video, video_params)
 

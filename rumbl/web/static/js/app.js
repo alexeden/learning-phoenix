@@ -1,8 +1,8 @@
 import 'phoenix_html';
-import { Player } from './player';
+import socket from './socket';
+import { Video } from './video';
 
 const video = document.getElementById('video');
 
-if(video) {
-  Player.init(video.id, video.getAttribute('data-player-id'), () => console.log(`${video.id} player ready!`));
-}
+Video.init(socket, document.getElementById('video'));
+// video.id, video.getAttribute('data-player-id'), () => console.log(`${video.id} player ready!`));
