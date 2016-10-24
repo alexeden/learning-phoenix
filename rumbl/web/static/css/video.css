@@ -1,0 +1,8 @@
+#video {
+  min-height: 100%;
+  width: 100%;
+}
+
+#msg-container {
+  min-height: 200px;
+}

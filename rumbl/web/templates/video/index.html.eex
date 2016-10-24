@@ -1,4 +1,4 @@
-<h2>Listing videos</h2>
+<h2>Videos added by you</h2>
 
 <table class="table">
   <thead>
@@ -6,7 +6,7 @@
       <th>Title</th>
       <th>Category</th>
       <th>User</th>
-      <th>Url</th>
+      <!-- <th>Url</th> -->
       <th>Description</th>
 
       <th></th>
@@ -16,15 +16,34 @@
 <%= for video <- @videos do %>
     <tr>
       <td><%= video.title %></td>
-      <td><%= video.category.name %> (<%= video.category_id %>)</td>
-      <td><%= @user.username %> (<%= @user.id %>)</td>
-      <td><%= video.url %></td>
+      <td><%= video.category.name %></td>
+      <td><%= @user.username %></td>
+      <!-- <td></%= video.url %></td> -->
       <td><%= video.description %></td>
 
       <td class="text-right">
-        <%= link "Show", to: video_path(@conn, :show, video), class: "btn btn-default btn-xs" %>
-        <%= link "Edit", to: video_path(@conn, :edit, video), class: "btn btn-default btn-xs" %>
-        <%= link "Delete", to: video_path(@conn, :delete, video), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+        <%=
+          link "Details",
+          to: video_path(@conn, :show, video),
+          class: "btn btn-default btn-xs"
+        %>
+        <%=
+          link "Watch",
+          to: watch_path(@conn, :show, video),
+          class: "btn btn-default btn-xs"
+        %>
+        <%=
+          link "Edit",
+          to: video_path(@conn, :edit, video),
+          class: "btn btn-default btn-xs"
+        %>
+        <%=
+          link "Delete",
+          to: video_path(@conn, :delete, video),
+          method: :delete,
+          data: [confirm: "Are you sure?"],
+          class: "btn btn-danger btn-xs"
+        %>
       </td>
     </tr>
 <% end %>

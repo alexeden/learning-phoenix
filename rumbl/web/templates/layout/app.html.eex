@@ -23,10 +23,10 @@
               <%= @current_user.username %>
             </li>
             <li>
-              <%=
-                link "Users",
-                to: user_path(@conn, :index)
-              %>
+              <%= link "My Videos", to: video_path(@conn, :index) %>
+            </li>
+            <li>
+              <%= link "Users", to: user_path(@conn, :index) %>
             </li>
             <li>
               <%=
