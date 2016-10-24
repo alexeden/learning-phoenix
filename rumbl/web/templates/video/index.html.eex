@@ -16,8 +16,8 @@
 <%= for video <- @videos do %>
     <tr>
       <td><%= video.title %></td>
-      <td><%= video.category %></td>
-      <td><%= @user.username %></td>
+      <td><%= video.category.name %> (<%= video.category_id %>)</td>
+      <td><%= @user.username %> (<%= @user.id %>)</td>
       <td><%= video.url %></td>
       <td><%= video.description %></td>
 
@@ -26,9 +26,6 @@
         <%= link "Edit", to: video_path(@conn, :edit, video), class: "btn btn-default btn-xs" %>
         <%= link "Delete", to: video_path(@conn, :delete, video), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
       </td>
-    </tr>
-    <tr>
-      <pre><%= inspect video %></pre>
     </tr>
 <% end %>
   </tbody>

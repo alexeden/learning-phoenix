@@ -10,23 +10,10 @@ defmodule Rumbl.VideoController do
     apply(__MODULE__, action_name(conn), [conn, conn.params, conn.assigns.current_user])
   end
 
-
-  @doc """
-  Returns a query of all videos scoped to the provided user
-  """
-  defp user_videos(user) do
-    assoc(user, :videos)
-  end
-
-  defp user_video_by_id(user, id) do
+  defp user_video_by_id(user, video_id) do
     user
-    |> user_videos
-    |> Repo.get!(id)
-
-  end
-
-  defp video_category(video) do
-    assoc(video, :category)
+      |> assoc(:videos)
+      |> Repo.get!(video_id)
   end
 
   defp load_categories(conn, _) do
@@ -41,10 +28,11 @@ defmodule Rumbl.VideoController do
   end
 
   def index(conn, _params, user) do
-    videos = user
-      |> user_videos
-      |> preload(:category)
-      |> Repo.all
+    videos =
+      Repo.all from v in Video,
+        join: assoc(v, :user),
+        join: assoc(v, :category),
+        preload: [:category]
 
     render(conn, "index.html", videos: videos, user: user)
   end

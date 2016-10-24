@@ -7,7 +7,13 @@ defmodule Rumbl.UserController do
   plug :authenticate_user when action in [:index, :show]
 
   def index(conn, _params) do
-    users = Repo.all(User)
+    # users = Repo.all(User)
+    users =
+      Repo.all from u in User,
+        join: v in assoc(u, :videos),
+        join: c in assoc(v, :category),
+        preload: [videos: {v, category: c}]
+
     render conn, "index.html", users: users
   end
 
