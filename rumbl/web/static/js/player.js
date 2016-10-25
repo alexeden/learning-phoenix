@@ -42,13 +42,6 @@ export const Player = {
     document.head.appendChild(youtubeScriptTag);
   },
 
-  getCurrentTime$() {
-    return Rx.Observable
-      .interval(1000)
-      .do(tag('getCurrentTime$'))
-      .map(() => this.getCurrentTime());
-  },
-
   onPlayerStateChange(event) {
     console.log('player state change event: ', event);
   },

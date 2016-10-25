@@ -30,15 +30,6 @@ const templatize = a =>
     })
   });
 
-const renderAnnotation =
-  msgContainer => annotation => {
-    const {$elem} = annotation;
-    msgContainer.appendChild($elem);
-    msgContainer.scrollTop = msgContainer.scrollHeight;
-    return annotation;
-  };
-
-
 const renderAtTime =
   msgContainer => (seconds, annos) => {
 
@@ -54,8 +45,6 @@ const scheduleMessages =
       .subscribe(([show, hide]) => {
         show.map(({$elem}) => msgContainer.appendChild($elem));
         hide.map(({$elem}) => msgContainer.removeChild($elem));
-        console.log('show: ', show);
-        console.log('hide: ', hide);
       });
   };
 
@@ -78,34 +67,26 @@ export const Video = {
     const msgInput = elemById('msg-input');
     const postButton = elemById('msg-submit');
     const vidChannel = socket.channel(`videos:${videoId}`);
-
-    postButton.addEventListener('click', e => {
-      const payload = {
-        body: msgInput.value,
-        at: Player.getCurrentTime()
-      };
-
-      vidChannel
-        .push('new_annotation', payload)
-        .receive('error', tagError('new_annotation'));
-
-      msgInput.value = '';
-    });
-
     const renderer = scheduleMessages(msgContainer);
 
+    Player.currentTime$.subscribe(tag('currentTime$'));
+
+    postButton.addEventListener('click', e => {
+      if(!msgInput.value || msgInput.value.length < 1) return;
+
+      vidChannel
+        .push('new_annotation', {
+          body: msgInput.value,
+          at: Player.getCurrentTime()
+        })
+        .receive('error', tagError('new_annotation'))
+        .receive('ok', () => msgInput.value = '');
+    });
+
     vidChannel.on('new_annotation', compose(renderer, of, templatize));
-    vidChannel.on('ping', ({count}) => log('PING!', count));
 
     vidChannel.join()
-      .receive(
-        'ok',
-        pipe(
-          prop('annotations'),
-          map(templatize),
-          renderer
-        )
-      )
+      .receive('ok', compose(renderer, map(templatize), prop('annotations')))
       .receive('error', tagError('join failed'))
   }
 

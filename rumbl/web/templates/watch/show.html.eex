@@ -19,8 +19,7 @@
           id="msg-input"
           rows="3"
           class="form-control"
-          placeholder="Say something...">
-        </textarea>
+          placeholder="Say something..."></textarea>
         <button id="msg-submit" class="btn btn-primary form-control" type="submit">
           Post
         </button>
