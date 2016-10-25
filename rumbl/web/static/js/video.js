@@ -1,9 +1,9 @@
 import { Player, tag } from './player';
 import { Observable } from 'rxjs';
 import * as R from 'ramda';
-const { pipe, compose, prop, map, of } = R;
+const { pipe, compose, prop, map, of, lensPath, apply } = R;
 
-const log = console.log.bind(console);
+const log = x => console.log(x) || x;
 const tagError = (msg = '') => data => console.error(`${msg} error: `, data) || data;
 const attr = (elem, attr) => elem.getAttribute(attr);
 const dataAttr = (elem, attribute) => attr(elem, `data-${attribute}`);
@@ -65,6 +65,7 @@ export const Video = {
     const postButton = elemById('msg-submit');
     const vidChannel = socket.channel(`videos:${videoId}`);
     const renderer = scheduleMessages(msgContainer);
+    const setLastSeenId = id => vidChannel.params.last_seen_id = id;
 
     postButton.addEventListener('click', e => {
       if(!msgInput.value || msgInput.value.length < 1) return;
@@ -79,9 +80,11 @@ export const Video = {
     });
 
     vidChannel.on('new_annotation', compose(renderer, of, templatize));
+    vidChannel.on('new_annotation', compose(setLastSeenId, prop('id')));
 
     vidChannel.join()
       .receive('ok', compose(renderer, map(templatize), prop('annotations')))
+      .receive('ok', compose(setLastSeenId, apply(Math.max), map(prop('id')), prop('annotations')))
       .receive('error', tagError('join failed'))
   }
 
