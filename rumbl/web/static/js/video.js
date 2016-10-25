@@ -1,39 +1,71 @@
-import { Player } from './player';
+import { Player, tag } from './player';
+import { Observable } from 'rxjs';
+import * as R from 'ramda';
+const { pipe, compose, prop, map, of } = R;
 
 const log = console.log.bind(console);
-const tag = (msg = '') => data => console.log(`${msg}: `, data) || data;
 const tagError = (msg = '') => data => console.error(`${msg} error: `, data) || data;
 const attr = (elem, attr) => elem.getAttribute(attr);
 const dataAttr = (elem, attribute) => attr(elem, `data-${attribute}`);
 const elemById = id => document.getElementById(id);
 
+const formatTime = at => new Date(null).setSeconds(at/1000).toISOString().substr(14, 5);
 
-const esc = str => {
-  const div = document.createElement('div');
-  div.appendChild(document.createTextNode(str));
-  return div.innerHTML;
-};
-
-const renderAnnotation = msgContainer =>
-  ({user, body, at}) => {
-    const template = document.createElement('div');
-    template.innerHTML = `
-      <a href="#" data-seek="${esc(at)}">
-        <b>${esc(user.username)}</b>: ${esc(body)}
-      </a>
-    `;
-    msgContainer.appendChild(template);
-    msgContainer.scrollTop = msgContainer.scrollHeight;
+const escape =
+  str => {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
   };
+
+const templatize = a =>
+  Object.assign({}, a, {
+    $id: `annotation-${a.id}`,
+    $elem: Object.assign(document.createElement('div'), {
+      id: `annotation-${a.id}`,
+      innerHTML: `
+        <a href="#" data-seek="${escape(a.at)}">
+          <b>${escape(a.user.username)}</b>: ${escape(a.body)}
+        </a>`
+    })
+  });
+
+const renderAnnotation =
+  msgContainer => annotation => {
+    const {$elem} = annotation;
+    msgContainer.appendChild($elem);
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+    return annotation;
+  };
+
+
+const renderAtTime =
+  msgContainer => (seconds, annos) => {
+
+  };
+
+const scheduleMessages =
+  msgContainer => annotations => {
+    Player.currentTime$
+      .map(t => [
+        /* show */ annotations.filter(a => a.at <= t && !a.$elem.isConnected),
+        /* hide */ annotations.filter(a => a.at > t && a.$elem.isConnected)
+      ])
+      .subscribe(([show, hide]) => {
+        show.map(({$elem}) => msgContainer.appendChild($elem));
+        hide.map(({$elem}) => msgContainer.removeChild($elem));
+        console.log('show: ', show);
+        console.log('hide: ', hide);
+      });
+  };
+
 
 
 export const Video = {
 
   init(socket, elem) {
     if(!elem) return;
-
     socket.connect();
-
     Player.init(
       elem.id,
       dataAttr(elem, 'player-id'),
@@ -42,7 +74,7 @@ export const Video = {
   },
 
   onReady(videoId, socket) {
-    const msgContainer = elemById('msg-container');
+    const msgContainer = window['msgContainer'] = elemById('msg-container');
     const msgInput = elemById('msg-input');
     const postButton = elemById('msg-submit');
     const vidChannel = socket.channel(`videos:${videoId}`);
@@ -60,12 +92,20 @@ export const Video = {
       msgInput.value = '';
     });
 
+    const renderer = scheduleMessages(msgContainer);
 
-    vidChannel.on('new_annotation', renderAnnotation(msgContainer));
+    vidChannel.on('new_annotation', compose(renderer, of, templatize));
     vidChannel.on('ping', ({count}) => log('PING!', count));
 
     vidChannel.join()
-      .receive('ok', tag('joined the video channel'))
+      .receive(
+        'ok',
+        pipe(
+          prop('annotations'),
+          map(templatize),
+          renderer
+        )
+      )
       .receive('error', tagError('join failed'))
   }
 

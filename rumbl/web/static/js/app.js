@@ -1,4 +1,5 @@
 import 'phoenix_html';
+import * as Rx from 'rxjs';
 import socket from './socket';
 import { Video } from './video';
 
