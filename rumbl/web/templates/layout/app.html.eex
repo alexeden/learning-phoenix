@@ -23,7 +23,7 @@
               <%= @current_user.username %>
             </li>
             <li>
-              <%= link "My Videos", to: video_path(@conn, :index) %>
+              <%= link "Videos", to: video_path(@conn, :index) %>
             </li>
             <li>
               <%= link "Users", to: user_path(@conn, :index) %>
@@ -51,6 +51,7 @@
       </main>
 
     </div>
+    <script>window.userToken = "<%= assigns[:user_token] %>"</script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
