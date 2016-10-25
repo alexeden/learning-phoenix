@@ -9,7 +9,12 @@ const attr = (elem, attr) => elem.getAttribute(attr);
 const dataAttr = (elem, attribute) => attr(elem, `data-${attribute}`);
 const elemById = id => document.getElementById(id);
 
-const formatTime = at => new Date(null).setSeconds(at/1000).toISOString().substr(14, 5);
+const formatTime =
+  at => {
+    const d = new Date(null);
+    d.setSeconds(at/1000);
+    return d.toISOString().substr(14, 5);
+  };
 
 const escape =
   str => {
@@ -18,65 +23,55 @@ const escape =
     return div.innerHTML;
   };
 
-const templatize = a =>
-  Object.assign({}, a, {
-    $id: `annotation-${a.id}`,
-    $elem: Object.assign(document.createElement('div'), {
-      id: `annotation-${a.id}`,
-      innerHTML: `
-        <a href="#" data-seek="${escape(a.at)}">
-          <b>${escape(a.user.username)}</b>: ${escape(a.body)}
-        </a>`
-    })
-  });
-
-const renderAtTime =
-  msgContainer => (seconds, annos) => {
-
-  };
+const templatize =
+  a =>
+    Object.assign({}, a, {
+      $elem: Object.assign(document.createElement('div'), {
+        id: `annotation-${a.id}`,
+        innerHTML: `
+          <a href="#">
+            [${formatTime(a.at)}]
+            <b>${escape(a.user.username)}</b>: ${escape(a.body)}
+          </a>`,
+        onclick: () => Player.seekTo(a.at)
+      })
+    });
 
 const scheduleMessages =
-  msgContainer => annotations => {
+  msgContainer => annotations =>
     Player.currentTime$
       .map(t => [
-        /* show */ annotations.filter(a => a.at <= t && !a.$elem.isConnected),
-        /* hide */ annotations.filter(a => a.at > t && a.$elem.isConnected)
+        annotations.filter(a => a.at <= t && !a.$elem.isConnected),
+        annotations.filter(a => a.at > t && a.$elem.isConnected)
       ])
       .subscribe(([show, hide]) => {
         show.map(({$elem}) => msgContainer.appendChild($elem));
         hide.map(({$elem}) => msgContainer.removeChild($elem));
       });
-  };
-
-
 
 export const Video = {
 
   init(socket, elem) {
     if(!elem) return;
     socket.connect();
-    Player.init(
-      elem.id,
-      dataAttr(elem, 'player-id'),
+    Player.init(elem.id, dataAttr(elem, 'player-id'),
       () => this.onReady(dataAttr(elem, 'id'), socket)
     );
   },
 
   onReady(videoId, socket) {
     const msgContainer = window['msgContainer'] = elemById('msg-container');
-    const msgInput = elemById('msg-input');
+    const msgInput = window['msgInput'] = elemById('msg-input');
     const postButton = elemById('msg-submit');
     const vidChannel = socket.channel(`videos:${videoId}`);
     const renderer = scheduleMessages(msgContainer);
-
-    Player.currentTime$.subscribe(tag('currentTime$'));
 
     postButton.addEventListener('click', e => {
       if(!msgInput.value || msgInput.value.length < 1) return;
 
       vidChannel
         .push('new_annotation', {
-          body: msgInput.value,
+          body: msgInput.value || '',
           at: Player.getCurrentTime()
         })
         .receive('error', tagError('new_annotation'))
@@ -89,6 +84,5 @@ export const Video = {
       .receive('ok', compose(renderer, map(templatize), prop('annotations')))
       .receive('error', tagError('join failed'))
   }
-
 
 };

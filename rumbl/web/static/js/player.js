@@ -42,10 +42,6 @@ export const Player = {
     document.head.appendChild(youtubeScriptTag);
   },
 
-  onPlayerStateChange(event) {
-    console.log('player state change event: ', event);
-  },
-
   getCurrentTime() {
     return Math.floor(this.player.getCurrentTime() * 1000)
   },
