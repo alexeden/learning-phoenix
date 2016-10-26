@@ -1,7 +1,7 @@
 import { Player, tag } from './player';
 import { Observable } from 'rxjs';
 import * as R from 'ramda';
-const { pipe, compose, prop, map, of, lensPath, apply } = R;
+const { pipe, compose, prop, map, lensPath, apply, juxt, tap } = R;
 
 const log = x => console.log(x) || x;
 const tagError = (msg = '') => data => console.error(`${msg} error: `, data) || data;
@@ -79,12 +79,16 @@ export const Video = {
         .receive('ok', () => msgInput.value = '');
     });
 
-    vidChannel.on('new_annotation', compose(renderer, of, templatize));
-    vidChannel.on('new_annotation', compose(setLastSeenId, prop('id')));
+    vidChannel.on('new_annotation', juxt([
+      compose(renderer, Array.of, templatize),
+      compose(setLastSeenId, prop('id'))
+    ]));
 
     vidChannel.join()
-      .receive('ok', compose(renderer, map(templatize), prop('annotations')))
-      .receive('ok', compose(setLastSeenId, apply(Math.max), map(prop('id')), prop('annotations')))
+      .receive('ok', juxt([
+        compose(renderer, map(templatize), prop('annotations')),
+        compose(setLastSeenId, apply(Math.max), map(prop('id')), prop('annotations'))
+      ]))
       .receive('error', tagError('join failed'))
   }
 
